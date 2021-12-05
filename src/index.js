@@ -1,92 +1,72 @@
-//mocked for now, just testing how the output will look for hardcoded behaviour
+const g = require("./graphics");
 const fs = require("fs");
+const parser = require("./parser");
 
-const ADDITIVE_MODE = "ADDITIVE";
-const WIDTH = 256;
-const HEIGHT = 256;
-const MAX_VAL = 256;
+const createSquiggle = (desc, s) => {
+    const groups = parser.parseCode(s.code);
+    const dir = s.dir ? s.dir : [1, 0];
+    const manualMove = s.manualMove ? s.manualMove : false;
+    return {
+        groups, dir, manualMove,
+        rgb: [0, 0, 0],
+        rgbIncrement: [1, 1, 1],
+        canvas: g.createCanvas(desc.width, desc.height),
+        position: [0, 0],
+        groupToExecute: 0
+    };
+}
 
-const createCanvas = (width, height, toCopy) => {
-    const canvas = new Array(height);
-    for (let y = 0; y < canvas.length; y++) {
-        canvas[y] = new Array(width);
-        if (toCopy) {
-            for (let x = 0; x < width; x++) {
-                canvas[y][x] = toCopy[y][x]
-            }
+const file = process.argv[2];
+const desc = JSON.parse(fs.readFileSync(file));
+desc.squiggles = desc.squiggles.map(s => createSquiggle(desc, s));
+
+const stepsPerFrame = desc.width * desc.height;
+
+const constraint = (position, width, height) => {
+    let x = position[0];
+    let y = position[1];
+    if (x < 0) {
+        x = width + x;
+        y -= 1;
+    } else if (x >= width) {
+        x = x % width;
+        y += 1;
+    }
+
+    if (y < 0) {
+        y = height + y;
+    } else if (y >= height) {
+        y = y % height;
+    }
+    return [x, y];
+}
+
+const execSquiggle = (desc, s) => {
+    const commands = s.groups[s.groupToExecute].commands;
+    commands.forEach(c => {
+        switch (c.command) {
+            case "+":
+                if (c.args) {
+                    if (c.args.length == 1) {
+                        let val = c.args[0]
+                        s.rgbIncrement = [val, val, val];
+                    } else {
+                        s.rgbIncrement = [c.args[0], c.args[1], c.args[2]];
+                    }
+                }
+                s.rgb = g.addRGB(s.rgb, s.rgbIncrement);
+                break;
         }
-    }
-    return canvas;
+    });
+    g.setPixel(s.canvas, s.position[0], s.position[1], s.rgb);
+    s.position = [s.position[0] + s.dir[0], s.position[1] + s.dir[1]];
+    s.position = constraint(s.position, desc.width, desc.height);
+    s.groupToExecute = (s.groupToExecute + 1) % Object.keys(s.groups).length;
 }
 
-const zipWith = (fn, m1, m2) => {
-    return m1.map((v, i) => fn(v, m2[i]));
+for (let i = 0; i < stepsPerFrame; i++) {
+    desc.squiggles.forEach(s => execSquiggle(desc, s));
 }
 
-const constraintVal = v => {
-    let nv = v % MAX_VAL;
-    if (nv < 0) {
-        nv = MAX_VAL + nv;
-    }
-    return nv;
-}
+g.toPPM(g.blendCanvases(desc.squiggles.map(s => s.canvas), desc.blendingMode));
 
-const addRGB = (rgb1, rgb2) => {
-    return zipWith(((v1, v2) => constraintVal(v1 + v2)), rgb1, rgb2);
-}
-
-const subRGB = (rgb1, rgb2) => {
-    return zipWith(((v1, v2) => constraintVal(v1 - v2)), rgb1, rgb2);
-}
-
-const blendCanvases = (cs, mode) => {
-    [fc, ...cs] = cs;
-    const output = createCanvas(fc[0].length, fc.length, fc);
-
-    for (let y = 0; y < fc.length; y++) {
-        for (let x = 0; x < fc[0].length; x++) {
-            const fn = mode == ADDITIVE_MODE ? (v1, v2) => addRGB(v1, v2) : (v1, v2) => subRGB(v1, v2);
-            if (cs) {
-                cs.forEach(c => {
-                    output[y][x] = fn(output[y][x], c[y][x]);
-                });
-            }
-        }
-    }
-    return output;
-}
-
-const toPPM = canvas => {
-    const preambule = "P3\n" + WIDTH + " " + HEIGHT + "\n" + MAX_VAL + "\n";
-    let pixels = ""
-    for (let y = 0; y < canvas.length; y++) {
-        for (let x = 0; x < canvas[0].length; x++) {
-            const [r, g, b] = canvas[y][x];
-            pixels += r + " " + g + " " + b + " ";
-        }
-        pixels += "\n";
-    }
-    fs.writeFileSync("output.ppm", preambule + pixels);
-}
-
-const c1 = createCanvas(WIDTH, HEIGHT);
-const c2 = createCanvas(WIDTH, HEIGHT);
-let mem1 = [0, 0, 0];
-let mem2 = [0, 0, 0];
-let frame = 0;
-for (let y = 0; y < c1.length; y++) {
-    for (let x = 0; x < c1[0].length; x++) {
-        mem1 = addRGB(mem1, [2, 2, 2]);
-        c1[y][x] = [mem1[0], mem1[1], mem1[2]];
-        frame += 1;
-        if (frame % 2 == 0) {
-            mem2 = addRGB(mem2, [-2, -2, 1]);
-        } else {
-            mem2 = addRGB(mem2, [2, 1, -3]);
-        }
-        c2[y][x] = [mem2[0], mem2[1], mem2[2]];
-    }
-}
-
-const outCanvas = blendCanvases([c1, c2], ADDITIVE_MODE);
-toPPM(outCanvas);

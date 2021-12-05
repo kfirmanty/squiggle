@@ -16,7 +16,7 @@ s1{                 § describes squiggle - a register based machine (r,g,b) whi
 }                   § this squiggle will add 2 to each r g b component and draw the combined rgb value to canvas
 
 s2{
-[+(-2, -2, 1)] [+(2, 1, -3)]  § this squiggle will alternate between applying (-2, -2, 1) to rgb vector and (2, 1, -3)
+[+(-2 -2 1)] [+(2 1 -3)]  § this squiggle will alternate between applying (-2 -2 1) to rgb vector and (2 1 -3)
 }
 ```
 
