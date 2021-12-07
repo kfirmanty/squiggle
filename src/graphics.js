@@ -61,7 +61,7 @@ const toPPM = canvas => {
     for (let y = 0; y < canvas.length; y++) {
         for (let x = 0; x < canvas[0].length; x++) {
             const [r, g, b] = canvas[y][x];
-            pixels += r + " " + g + " " + b + " ";
+            pixels += Math.floor(r) + " " + Math.floor(g) + " " + Math.floor(b) + " ";
         }
         pixels += "\n";
     }
@@ -76,4 +76,5 @@ exports.createCanvas = createCanvas;
 exports.addRGB = addRGB;
 exports.subRGB = subRGB;
 exports.setPixel = setPixel;
+exports.constraintVal = constraintVal;
 exports.constants = { ADDITIVE_MODE };

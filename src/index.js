@@ -9,10 +9,10 @@ const createSquiggle = (desc, s) => {
     return {
         groups, dir, manualMove,
         rgb: [0, 0, 0],
-        rgbIncrement: [1, 1, 1],
         canvas: g.createCanvas(desc.width, desc.height),
         position: [0, 0],
-        groupToExecute: 0
+        groupToExecute: 0,
+        stack: []
     };
 }
 
@@ -41,20 +41,65 @@ const constraint = (position, width, height) => {
     return [x, y];
 }
 
+const takeN = (squiggle, n) => {
+    let result = [];
+    for (let i = n; i > 0; i--) {
+        result.push(squiggle.stack.shift());
+    }
+    return result;
+}
+
 const execSquiggle = (desc, s) => {
     const commands = s.groups[s.groupToExecute].commands;
     commands.forEach(c => {
-        switch (c.command) {
+        switch (c) {
             case "+":
-                if (c.args) {
-                    if (c.args.length == 1) {
-                        let val = c.args[0]
-                        s.rgbIncrement = [val, val, val];
-                    } else {
-                        s.rgbIncrement = [c.args[0], c.args[1], c.args[2]];
-                    }
-                }
-                s.rgb = g.addRGB(s.rgb, s.rgbIncrement);
+                s.rgb = g.addRGB(s.rgb, takeN(s, 3));
+                break;
+            case "x":
+                s.stack.unshift(s.position[0]);
+                break;
+            case "y":
+                s.stack.unshift(s.position[1]);
+                break;
+            case "set":
+                s.rgb = takeN(s, 3).map(g.constraintVal);
+                break;
+            case "add": {
+                let [v1, v2] = takeN(s, 2);
+                s.stack.unshift(v1 + v2)
+                break;
+            }
+            case "sub": {
+                let [v1, v2] = takeN(s, 2);
+                s.stack.unshift(v1 - v2)
+                break;
+            }
+            case "mult": {
+                let [v1, v2] = takeN(s, 2);
+                s.stack.unshift(v1 * v2)
+                break;
+            }
+            case "div": {
+                let [v1, v2] = takeN(s, 2);
+                s.stack.unshift(v1 / v2)
+                break;
+            }
+            case "sin":
+                s.stack.unshift(Math.sin(s.stack.shift()));
+                break;
+            case "dist": {
+                let [v1, v2] = takeN(s, 2);
+                let distX = s.position[0] - v1;
+                let distY = s.position[1] - v2;
+                s.stack.unshift(Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)));
+                break;
+            }
+            case "dup":
+                s.stack.unshift(s.stack[0]);
+                break;
+            default:
+                s.stack.unshift(c);
                 break;
         }
     });

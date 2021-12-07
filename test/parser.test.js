@@ -4,19 +4,13 @@ const parser = require("../src/parser.js");
 
 describe("Parser tests", () => {
     it("should properly parse input", () => {
-        const parsed = parser.parseCode("[+(20)] [+(1 -3 2)]");
+        const parsed = parser.parseCode("[20 +] [2 -3 1 +]");
         expect(parsed).to.deep.equal({
             0: {
-                commands: [{
-                    command: "+",
-                    args: [20]
-                }]
+                commands: [20, "+"]
             },
             1: {
-                commands: [{
-                    command: "+",
-                    args: [1, -3, 2]
-                }]
+                commands: [2, -3, 1, "+"]
             }
         });
     });

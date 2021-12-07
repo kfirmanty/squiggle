@@ -18,46 +18,8 @@ const eatEnclosed = (code, endingChar) => {
 
 const eatGroup = code => eatEnclosed(code, "]");
 
-const isArgsStart = code => code[0] == "(";
-
-const eatArgs = code => eatEnclosed(code, ")");
-
-const optionallyEatArgs = code => {
-    if (isArgsStart(code)) {
-        const [restCode, rawArgs] = eatArgs(code);
-        let args = rawArgs.split(/\s+/).map(v => isNaN(v) ? v : parseInt(v));
-        return [restCode, args];
-    } else {
-        return [code];
-    }
-}
-
-const eatCommand = code => {
-    let command = null;
-    let restCode = code;
-    const commands = ["+", "-", "/", "*", "mov", "setdir"];
-    commands.forEach(cmd => restCode.startsWith(cmd) ? command = cmd : null);
-    if (command) {
-        restCode = restCode.replace(command, "");
-        const commandObj = { command };
-        let [codeAfterEat, args] = optionallyEatArgs(restCode);
-        if (args) {
-            commandObj.args = args;
-        }
-        return [codeAfterEat, commandObj];
-    } else {
-        throw Error("Failed to parse command from: " + restCode);
-    }
-}
-
 const groupToCommands = code => {
-    const commands = [];
-    while (code) {
-        const [restCode, command] = eatCommand(code);
-        code = restCode;
-        commands.push(command);
-    }
-    return commands;
+    return code.split(/\s+/).map(v => isNaN(v) ? v : parseInt(v));
 }
 
 const codeToGroups = code => {
