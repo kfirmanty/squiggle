@@ -30,3 +30,4 @@ which should yield following image:
 ![](gallery/position_dependent.png)
 ![](gallery/periodic_subtracted.png)
 ![](gallery/periodic.png)
+![](gallery/periodic_and_positional_blend.png)
