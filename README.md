@@ -19,12 +19,14 @@ s1{                 § describes squiggle - a register based machine (r,g,b) whi
 s2{
 [1 -2 -2 +] [-3 1 2 list +]  § this squiggle will alternate between applying (-2 -2 1) to rgb vector and (2 1 -3)
 }
-
-s3{
-[x sin y sin 0 +] $ this squiggle will add vector of (0 sin(y) sin(x)) to rgb vector
-}
 ```
 
 which should yield following image:
 
 ![example image](output.png)
+
+## gallery
+
+![](gallery/position_dependent.png)
+![](gallery/periodic_subtracted.png)
+![](gallery/periodic.png)
