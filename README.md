@@ -31,3 +31,4 @@ which should yield following image:
 ![](gallery/periodic_subtracted.png)
 ![](gallery/periodic.png)
 ![](gallery/periodic_and_positional_blend.png)
+![](gallery/basic_repetitions.png)
