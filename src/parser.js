@@ -22,13 +22,27 @@ const groupToCommands = code => {
     return code.split(/\s+/).map(v => isNaN(v) ? v : parseInt(v));
 }
 
+const optionallyEatRepetitions = code => {
+    let repetitionsString = "";
+    let restCode = code;
+    while (restCode && restCode[0] && !isNaN(restCode[0])) {
+        repetitionsString += restCode[0];
+        restCode = restCode.slice(1);
+    }
+    return [restCode, repetitionsString ? parseInt(repetitionsString) : null];
+}
+
 const codeToGroups = code => {
     let restCode = code.trim();
     let groups = [];
     while (restCode) {
-        let [nCode, group] = eatGroup(restCode);
-        groups.push(group);
-        restCode = nCode.trim();
+        let [nCode, commands] = eatGroup(restCode);
+        let [rCode, repetitions] = optionallyEatRepetitions(nCode);
+        groups.push({
+            commands,
+            repetitions: repetitions
+        });
+        restCode = rCode.trim();
     }
     return groups;
 }
@@ -37,7 +51,10 @@ const parseCode = code => {
     const groups = codeToGroups(code);
     let parsed = {};
     groups.forEach((g, i) => {
-        parsed[i] = { commands: groupToCommands(g) };
+        parsed[i] = {
+            commands: groupToCommands(g.commands),
+            repetitions: g.repetitions ? g.repetitions : 1
+        };
     });
     return parsed;
 }

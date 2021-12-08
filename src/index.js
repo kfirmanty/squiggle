@@ -12,7 +12,8 @@ const createSquiggle = (desc, s) => {
         canvas: g.createCanvas(desc.width, desc.height),
         position: [0, 0],
         groupToExecute: 0,
-        stack: []
+        groupCountdown: groups[0].repetitions,
+        stack: [],
     };
 }
 
@@ -50,7 +51,8 @@ const takeN = (squiggle, n) => {
 }
 
 const execSquiggle = (desc, s) => {
-    const commands = s.groups[s.groupToExecute].commands;
+    const group = s.groups[s.groupToExecute];
+    const commands = group.commands;
     commands.forEach(c => {
         switch (c) {
             case "+":
@@ -98,6 +100,16 @@ const execSquiggle = (desc, s) => {
             case "dup":
                 s.stack.unshift(s.stack[0]);
                 break;
+            case "irandBi":
+                s.stack.unshift(Math.floor((Math.random() - 0.5) * 2 * (s.stack.shift() + 1)));
+                break;
+            case "irand":
+                s.stack.unshift(Math.floor(Math.random() * (s.stack.shift() + 1)));
+                break;
+            case "dir": {
+                s.dir = takeN(s, 2);
+                break;
+            }
             default:
                 s.stack.unshift(c);
                 break;
@@ -106,7 +118,11 @@ const execSquiggle = (desc, s) => {
     g.setPixel(s.canvas, s.position[0], s.position[1], s.rgb);
     s.position = [s.position[0] + s.dir[0], s.position[1] + s.dir[1]];
     s.position = constraint(s.position, desc.width, desc.height);
-    s.groupToExecute = (s.groupToExecute + 1) % Object.keys(s.groups).length;
+    s.groupCountdown = s.groupCountdown - 1;
+    if (s.groupCountdown == 0) {
+        s.groupToExecute = (s.groupToExecute + 1) % Object.keys(s.groups).length;
+        s.groupCountdown = s.groups[s.groupToExecute].repetitions;
+    }
 }
 
 for (let i = 0; i < stepsPerFrame; i++) {
