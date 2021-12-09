@@ -50,9 +50,7 @@ const takeN = (squiggle, n) => {
     return result;
 }
 
-const execSquiggle = (desc, s) => {
-    const group = s.groups[s.groupToExecute];
-    const commands = group.commands;
+const execCommands = (s, tick, commands) => {
     commands.forEach(c => {
         switch (c) {
             case "+":
@@ -110,11 +108,20 @@ const execSquiggle = (desc, s) => {
                 s.dir = takeN(s, 2);
                 break;
             }
+            case "t":
+                s.stack.unshift(tick);
+                break;
             default:
                 s.stack.unshift(c);
                 break;
         }
     });
+}
+
+const execSquiggle = (desc, s, tick) => {
+    const group = s.groups[s.groupToExecute];
+    const commands = group.commands;
+    execCommands(s, tick, commands);
     g.setPixel(s.canvas, s.position[0], s.position[1], s.rgb);
     s.position = [s.position[0] + s.dir[0], s.position[1] + s.dir[1]];
     s.position = constraint(s.position, desc.width, desc.height);
@@ -126,7 +133,7 @@ const execSquiggle = (desc, s) => {
 }
 
 for (let i = 0; i < stepsPerFrame; i++) {
-    desc.squiggles.forEach(s => execSquiggle(desc, s));
+    desc.squiggles.forEach(s => execSquiggle(desc, s, i));
 }
 
 g.toPPM(g.blendCanvases(desc.squiggles.map(s => s.canvas), desc.blendingMode));
