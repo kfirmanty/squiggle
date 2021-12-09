@@ -111,6 +111,39 @@ const execCommands = (s, tick, commands) => {
             case "t":
                 s.stack.unshift(tick);
                 break;
+            case ">":
+            case "=":
+            case "<":
+            case "<=":
+            case ">=": {
+                const [v1, v2] = takeN(s, 2);
+                let testResult;
+                if (c == ">") {
+                    testResult = v1 > v2;
+                } else if (c == "<") {
+                    testResult = v1 < v2;
+                } else if (c == "=") {
+                    testResult = v1 == v2;
+                } else if (c == ">=") {
+                    testResult = v1 >= v2;
+                } else if (c == "<=") {
+                    testResult = v1 <= v2;
+                }
+                s.stack.unshift(testResult);
+                break;
+            }
+            case "if": {
+                const [testVal, ifTrue, ifFalse] = takeN(s, 3);
+                //console.log("IF", testVal, ifTrue, ifFalse);
+                if (testVal) {
+                    execCommands(s, tick, ifTrue);
+                } else {
+                    execCommands(s, tick, ifFalse);
+                }
+                break;
+            }
+            case "nop":
+                break;
             default:
                 s.stack.unshift(c);
                 break;

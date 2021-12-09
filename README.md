@@ -1,5 +1,7 @@
 # squiggle
 
+post jam language version is here: [squiggle](https://github.com/kfirmanty/squiggle)
+
 `squiggle` is DSL to describe visual patterns and was created as an entry for `langjam002`
 
 A single `squiggle` executes stack based language with some special operators like `+` modifying the `squiggle` `rgb` vector.
@@ -16,6 +18,10 @@ between executing `[1 1 1 +]` and `[2 2 2 +]` after every tick.
 
 Patterns can also be repeated more than once so this:
 `[1 1 1 +]3 [2 2 2 +]` will repeat `[1 1 1 +]` for `3` ticks and then `[2 2 2 +]` for `1` tick.
+
+`squiggle` code can also contain conditionals. For it to work it is possible to define code blocks which are denoted by `()` parens.
+
+For example this code `[(1 1 1) (3 3 3) 128 x > if +]` will add `1 1 1` to `rgb` vector when `x` is less or equal to 128 and `3 3 3` otherwise.
 
 For convience the `squiggle` interpreter accepts config `.json` files which can define multiple `squiggles`.
 
@@ -51,3 +57,4 @@ which should yield following image:
 ![](gallery/periodic.png)
 ![](gallery/periodic_and_positional_blend.png)
 ![](gallery/basic_repetitions.png)
+![](gallery/basic_conditional.png)

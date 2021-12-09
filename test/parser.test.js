@@ -29,4 +29,24 @@ describe("Parser tests", () => {
             }
         });
     });
+    it("should properly parse code blocks in groups", () => {
+        const parsed = parser.parseCode("[20 +] [2 -3 1 +] [(1 1 1 +) (2 2 2 +) 2 x > if]");
+        expect(parsed).to.deep.equal({
+            0: {
+                commands: [20, "+"],
+                repetitions: 1
+            },
+            1: {
+                commands: [2, -3, 1, "+"],
+                repetitions: 1
+            },
+            2: {
+                commands: [
+                    [1, 1, 1, "+"],
+                    [2, 2, 2, "+"],
+                    2, "x", ">", "if"],
+                repetitions: 1
+            }
+        });
+    });
 });
