@@ -50,6 +50,10 @@ which should yield following image:
 
 ![example image](gallery/example.png)
 
+## how to run
+
+`node src/index.js examples/basic_conditional.json`
+
 ## gallery
 
 ![](gallery/position_dependent.png)
