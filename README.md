@@ -52,7 +52,10 @@ which should yield following image:
 
 ## how to run
 
-`node src/index.js examples/basic_conditional.json`
+```bash
+npm i
+node src/index.js examples/basic_conditional.json
+```
 
 ## gallery
 
