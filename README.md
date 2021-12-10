@@ -56,6 +56,7 @@ which should yield following image:
 npm i
 node src/index.js examples/basic_conditional.json
 ```
+which should result in file `output.ppm` being generated in project directory.
 
 ## gallery
 
