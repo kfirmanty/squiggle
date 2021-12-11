@@ -1,25 +1,8 @@
 const g = require("./graphics");
-const fs = require("fs");
-const parser = require("./parser");
-
-const createSquiggle = (desc, s) => {
-    const groups = parser.parseCode(s.code);
-    const dir = s.dir ? s.dir : [1, 0];
-    const manualMove = s.manualMove ? s.manualMove : false;
-    return {
-        groups, dir, manualMove,
-        rgb: [0, 0, 0],
-        canvas: g.createCanvas(desc.width, desc.height),
-        position: [0, 0],
-        groupToExecute: 0,
-        groupCountdown: groups[0].repetitions,
-        stack: [],
-    };
-}
+const vm = require("./vm");
 
 const file = process.argv[2];
-const desc = JSON.parse(fs.readFileSync(file));
-desc.squiggles = desc.squiggles.map(s => createSquiggle(desc, s));
+const desc = vm.init(file);
 
 const stepsPerFrame = desc.width * desc.height;
 

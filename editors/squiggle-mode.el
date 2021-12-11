@@ -21,7 +21,7 @@
 ;;; Code:
 (setq squiggle-font-lock-keywords
       (let* (
-             (x-keywords '("width" "height" "blendingMode" "squiggles" "code"))
+             (x-keywords '("width" "height" "blendingMode" "squiggles" "code" "fns"))
              (x-variables '("x" "y" "t"))
              (x-constants '("ADDITIVE" "SUBTRACTIVE" "MULT" "DIV"))
              (x-functions '("+" "-" "*" "/"

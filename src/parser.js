@@ -13,7 +13,7 @@ const eatEnclosed = (code, endingChar) => {
 
 const eatGroup = code => eatEnclosed(code, "]");
 
-const groupToCommands = code => {
+const codeStringToCommands = code => {
     return code.split(/(\(.*?\)|\s+)/).filter(v => v.trim()).map(v => isNaN(v) ? v : parseInt(v));
 }
 
@@ -45,16 +45,21 @@ const codeToGroups = code => {
 const isCodeBlock = command => command[0] == "(";
 const eatCodeBlock = code => eatEnclosed(code, ")");
 
+const parseCommands = commands => codeStringToCommands(commands).map(c => isCodeBlock(c) ? codeStringToCommands(eatCodeBlock(c)[1]) : c)
+
 const parseCode = code => {
     const groups = codeToGroups(code);
     let parsed = {};
     groups.forEach((g, i) => {
         parsed[i] = {
-            commands: groupToCommands(g.commands).map(c => isCodeBlock(c) ? groupToCommands(eatCodeBlock(c)[1]) : c),
+            commands: parseCommands(g.commands),
             repetitions: g.repetitions ? g.repetitions : 1
         };
     });
     return parsed;
 }
 
+const parseFn = (name, code) => ({ name, commands: parseCommands(code) });
+
 exports.parseCode = parseCode;
+exports.parseFn = parseFn;
