@@ -49,4 +49,11 @@ describe("Parser tests", () => {
             }
         });
     });
+    it("should properly parse fns", () => {
+        const parsed = parser.parseFn("vec3", "dup dup");
+        expect(parsed).to.deep.equal({
+            name: "vec3",
+            commands: ["dup", "dup"]
+        });
+    });
 });
