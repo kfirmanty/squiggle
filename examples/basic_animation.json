@@ -1,0 +1,10 @@
+{
+    "width": 200,
+    "height": 200,
+    "blendingMode": "ADDITIVE",
+    "squiggles": [
+        {
+            "code": "[1 1 1 +]"
+        }
+    ]
+}

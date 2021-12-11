@@ -72,7 +72,7 @@ const blendCanvases = (cs, mode) => {
     return output;
 }
 
-const toPPM = canvas => {
+const toPPM = (canvas, frame) => {
     const preambule = "P3\n" + canvas[0].length + " " + canvas.length + "\n" + MAX_VAL + "\n";
     let pixels = ""
     for (let y = 0; y < canvas.length; y++) {
@@ -82,7 +82,10 @@ const toPPM = canvas => {
         }
         pixels += "\n";
     }
-    fs.writeFileSync("output.ppm", preambule + pixels);
+    if (!fs.existsSync("out")) {
+        fs.mkdirSync("out");
+    }
+    fs.writeFileSync("out/frame" + frame + ".ppm", preambule + pixels);
 }
 
 const setPixel = (canvas, x, y, rgb) => canvas[y][x] = rgb;

@@ -68,9 +68,7 @@ which should result in file `output.ppm` being generated in project directory.
 ![](gallery/basic_conditional.png)
 
 ## todo
-- add ability to define fns which are shared between squiggles
 - allow for squiggles to communicate through queues
-- some utility fn to output animated gifs in addition to ppm files
 - better docs
 - experiment with operators that can change the code that squiggle is executing like increment all numeric values, swapping their signs, changing operator at random etc
 - ability for squiggles to operate on HSV color space
