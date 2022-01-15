@@ -10,6 +10,8 @@ const sync = process.argv[4];
 
 const stepsPerFrame = svm.width * svm.height;
 
+svm.squiggles.forEach(s => vm.execCommands(s, 0, s.init));
+
 for (let frame = 0; frame < frames; frame++) {
     for (let i = 0; i < stepsPerFrame; i++) {
         svm.squiggles.forEach(s => vm.execSquiggle(svm, s, i));

@@ -1,10 +1,27 @@
 {
-    "width": 200,
-    "height": 200,
+    "width": 256,
+    "height": 266,
     "blendingMode": "ADDITIVE",
     "squiggles": [
         {
-            "code": "[1 1 1 +]"
+            "init": "-1 p setv",
+            "code": "[(nop) (reverseP call) 150 y mod 0 = 256 x mod 0 = and if (nop) (incRGB call) 256 x mod 0 = if]"
+        },
+        {
+            "code": "[32 x div sin 1 add 127 mult dup dup set]"
+        },
+        {
+            "code": "[32 y div sin 1 add 127 mult dup dup set]"
+        },
+        {
+            "code": "[y x add y x set]"
+        },
+        {
+            "code": "[128 128 dist dup dup set]"
         }
-    ]
+    ],
+    "fns": {
+        "reverseP": "(1 p setv) (-1 p setv) p getv 1 = if",
+        "incRGB": "(-1 -1 -1) (1 1 1) p getv 1 = if +"
+    }
 }

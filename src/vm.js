@@ -40,6 +40,15 @@ const execCommands = (s, tick, commands) => {
             case "y":
                 s.stack.unshift(s.position[1]);
                 break;
+            case "r":
+                s.stack.unshift(s.rgb[0]);
+                break;
+            case "g":
+                s.stack.unshift(s.rgb[1]);
+                break;
+            case "b":
+                s.stack.unshift(s.rgb[2]);
+                break;
             case "set":
                 s.rgb = takeN(s, 3).map(g.constraintVal);
                 break;
@@ -61,6 +70,11 @@ const execCommands = (s, tick, commands) => {
             case "div": {
                 let [v1, v2] = takeN(s, 2);
                 s.stack.unshift(v1 / v2)
+                break;
+            }
+            case "mod": {
+                let [v1, v2] = takeN(s, 2);
+                s.stack.unshift(v1 % v2);
                 break;
             }
             case "sin":
@@ -93,7 +107,9 @@ const execCommands = (s, tick, commands) => {
             case "=":
             case "<":
             case "<=":
-            case ">=": {
+            case ">=":
+            case "and":
+            case "or": {
                 const [v1, v2] = takeN(s, 2);
                 let testResult;
                 if (c == ">") {
@@ -106,6 +122,10 @@ const execCommands = (s, tick, commands) => {
                     testResult = v1 >= v2;
                 } else if (c == "<=") {
                     testResult = v1 <= v2;
+                } else if (c == "and") {
+                    testResult = v1 && v2;
+                } else if (c == "or") {
+                    testResult = v1 || v2;
                 }
                 s.stack.unshift(testResult);
                 break;
@@ -120,14 +140,29 @@ const execCommands = (s, tick, commands) => {
                 }
                 break;
             }
-            case "nop":
-                break;
             case "call":
                 const fn = s.stack.shift();
                 if (!s.fns[fn]) {
                     throw Error("Unknown fn name!:", fn);
                 }
                 execCommands(s, tick, s.fns[fn].commands);
+                break;
+            case "setv": {
+                const [varName, v] = takeN(s, 2);
+                s.variables[varName] = v;
+                break;
+            }
+            case "getv": {
+                const varName = s.stack.shift();
+                const value = s.variables[varName];
+                if (value) {
+                    s.stack.unshift(value);
+                } else {
+                    throw Error("Trying to access unknown variable: " + varName);
+                }
+                break;
+            }
+            case "nop":
                 break;
             default:
                 s.stack.unshift(c);
@@ -152,6 +187,7 @@ const execSquiggle = (svm, s, tick) => {
 
 const createSquiggle = (desc, s) => {
     const groups = parser.parseCode(s.code);
+    const init = parser.parseFn("", s.init ? s.init : "nop").commands;
     const dir = s.dir ? s.dir : [1, 0];
     const manualMove = s.manualMove ? s.manualMove : false;
     return {
@@ -162,7 +198,9 @@ const createSquiggle = (desc, s) => {
         groupToExecute: 0,
         groupCountdown: groups[0].repetitions,
         stack: [],
-        fns: desc.fns
+        fns: desc.fns,
+        variables: {},
+        init
     };
 }
 
@@ -181,3 +219,4 @@ const init = desc => {
 
 exports.init = init;
 exports.execSquiggle = execSquiggle;
+exports.execCommands = execCommands;
