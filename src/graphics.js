@@ -5,6 +5,8 @@ const SUBTRACTIVE_MODE = "SUBTRACTIVE";
 const MULT_MODE = "MULT";
 const DIV_MODE = "DIV";
 const MAX_VAL = 256;
+const RGB_COLOR_MODE = "RGB";
+const HSV_COLOR_MODE = "HSV";
 
 const createCanvas = (width, height, toCopy) => {
     const canvas = new Array(height);
@@ -88,7 +90,34 @@ const toPPM = (canvas, frame) => {
     fs.writeFileSync("out/frame" + frame + ".ppm", preambule + pixels);
 }
 
-const setPixel = (canvas, x, y, rgb) => canvas[y][x] = rgb;
+const HSVtoRGB = ([h, s, v]) => {
+    let r, g, b, i, f, p, q, t;
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return [Math.round(r * 255),
+    Math.round(g * 255),
+    Math.round(b * 255)];
+};
+
+const setPixel = ({ canvas, position, rgb, colorMode }) => {
+    if (colorMode == RGB_COLOR_MODE) {
+        canvas[position[1]][position[0]] = rgb;
+    } else {
+        const converted = HSVtoRGB(rgb.map(v => v / MAX_VAL));
+        canvas[position[1]][position[0]] = converted;
+    }
+}
 
 exports.toPPM = toPPM;
 exports.blendCanvases = blendCanvases;

@@ -175,7 +175,7 @@ const execSquiggle = (svm, s, tick) => {
     const group = s.groups[s.groupToExecute];
     const commands = group.commands;
     execCommands(s, tick, commands);
-    g.setPixel(s.canvas, s.position[0], s.position[1], s.rgb);
+    g.setPixel(s);
     s.position = [s.position[0] + s.dir[0], s.position[1] + s.dir[1]];
     s.position = constraint(s.position, svm.width, svm.height);
     s.groupCountdown = s.groupCountdown - 1;
@@ -190,6 +190,7 @@ const createSquiggle = (desc, s) => {
     const init = parser.parseFn("", s.init ? s.init : "nop").commands;
     const dir = s.dir ? s.dir : [1, 0];
     const manualMove = s.manualMove ? s.manualMove : false;
+    const colorMode = s.colorMode ? s.colorMode : "RGB";
     return {
         groups, dir, manualMove,
         rgb: [0, 0, 0],
@@ -200,7 +201,8 @@ const createSquiggle = (desc, s) => {
         stack: [],
         fns: desc.fns,
         variables: {},
-        init
+        init,
+        colorMode
     };
 }
 
